@@ -1,18 +1,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"net/http"
+	"os"
+	"os/signal"
+
+	"github.com/souvik03-136/orders-api/application"
 )
 
 func main() {
-	server := &http.Server{
-		Addr:    ":3000",
-		Handler: http.HandlerFunc(basicHandler),
+	app := application.New()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+
+	defer cancel()
+
+	err := app.Start(ctx)
+	if err != nil {
+		fmt.Println("failed to start app: ", err)
 	}
-	err := server.ListenAndServe()
-	fmt.Println("failed to listen to server", err)
-}
-func basicHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello,WOrld!"))
+
 }
